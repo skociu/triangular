@@ -2,6 +2,10 @@
 
 An interactive web-based visualization tool for creating triangular arrangements of shapes. The application allows users to generate triangles composed of either hexagons or circles, with customizable properties including size, colors, spacing, and orientation (point up or point down).
 
+## Live Demo
+
+🎨 **[Try it live!](https://skociu.github.io/triangular/)**
+
 ## Features
 
 - Two visualization modes: Triangle with hexagons or Triangle with circles
@@ -16,7 +20,7 @@ An interactive web-based visualization tool for creating triangular arrangements
 
 ## Usage
 
-Open `triangle_visualization.html` in a web browser. Use the controls panel on the left to customize your visualization. Click and drag to pan, use the mouse wheel to zoom, and click "Save PNG" to download your creation.
+Open [the live demo](https://skociu.github.io/triangular/) or open `index.html` in a web browser. Use the controls panel on the left to customize your visualization. Click and drag to pan, use the mouse wheel to zoom, and click "Save PNG" to download your creation.
 
 ---
 
