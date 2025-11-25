@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .control-group h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .slider-container {
+            margin-bottom: 15px;
+        }
+
+        .slider-container label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .slider-container input[type="range"] {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .slider-container .value {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .radio-group {
+            margin-bottom: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .radio-option:hover {
+            background: #f5f5f5;
+        }
+
+        .radio-option input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .radio-option label {
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .color-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .color-input label {
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .color-input input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .info {
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .info p {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info p:last-child {
+            margin-bottom: 0;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        button.reset {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        button.save {
+            background: #2196F3;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .canvas-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            max-height: calc(100vh - 40px);
+        }
+
+        #hexCanvas {
+            max-width: 100%;
+            height: auto;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .pattern-description {
+            font-size: 11px;
+            color: #888;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #2196F3;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                height: auto;
+            }
+
+            .controls {
+                max-height: none;
+                margin-bottom: 10px;
+            }
+
+            .canvas-container {
+                min-height: 400px;
+                max-height: 60vh;
+            }
+
+            h2 {
+                font-size: 14px;
+                margin-bottom: 15px;
+            }
+
+            .control-group h3 {
+                font-size: 13px;
+            }
+
+            .slider-container label,
+            .radio-option label {
+                font-size: 12px;
+            }
+
+            button {
+                font-size: 12px;
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+
+            .controls {
+                padding: 15px;
+            }
+
+            .color-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .canvas-container {
+                padding: 10px;
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <h2>Triangle Visualization Config</h2>
+
+            <div class="slider-container">
+                <label>Visualization Mode</label>
+                <select id="visualMode" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                    <option value="triangle-hexagons">Triangle — Hexagons</option>
+                    <option value="triangle-circles">Triangle — Circles</option>
+                </select>
+                <div class="value">Mode: <span id="visualModeValue">Triangle — Hexagons</span></div>
+            </div>
+
+            <div class="slider-container" id="triangleControls">
+                <label>Triangle Rows</label>
+                <input type="range" id="triangleRows" min="1" max="60" value="5">
+                <div class="value">Rows: <span id="triangleRowsValue">5</span></div>
+            </div>
+
+            <div class="control-group" id="triangleOrientationControls" style="margin-top:10px;">
+                <h3>Triangle Orientation</h3>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="triangleUp" name="triangleOrientation" value="up" checked>
+                        <label for="triangleUp">Point Up (apex at top)</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="triangleDown" name="triangleOrientation" value="down">
+                        <label for="triangleDown">Point Down (apex at bottom)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Appearance</h3>
+                <div class="slider-container">
+                    <label>Shape Size</label>
+                    <input type="range" id="hexSize" min="15" max="50" value="25">
+                    <div class="value">Size: <span id="hexSizeValue">25</span></div>
+                </div>
+                <div class="color-input" style="margin-bottom: 10px;">
+                    <label>Edge Color</label>
+                    <input type="color" id="edgeColor" value="#333333">
+                </div>
+                <div class="color-input" style="margin-bottom: 10px;">
+                    <label>Fill Color</label>
+                    <input type="color" id="fillColor" value="#ffffff">
+                </div>
+                <div class="color-input" style="margin-bottom: 10px;">
+                    <label>Text Color</label>
+                    <input type="color" id="textColor" value="#000000">
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="showLabels" checked>
+                    <label for="showLabels">Show Number Labels</label>
+                </div>
+            </div>
+
+            <div class="slider-container">
+                <label>Spacing Between Shapes</label>
+                <input type="range" id="hexSpacing" min="0.80" max="1.00" step="0.01" value="0.80">
+                <div class="value">Spacing: <span id="hexSpacingValue">0.80</span></div>
+            </div>
+
+            <div class="info">
+                <p>Total Shapes: <strong><span id="totalHex">0</span></strong></p>
+            </div>
+
+            <div class="buttons">
+                <button class="reset" onclick="resetView()">Reset All</button>
+                <button class="save" onclick="savePNG()">Save PNG</button>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <svg id="hexCanvas"></svg>
+        </div>
+    </div>
+
+    <script>
+        // Hexagon grid configuration
+        let config = {
+            starLayers: 5,
+            patternType: 'flower',
+            flowerSpacing: 3,
+            flowerCenter: '#003366',
+            flowerPetal: '#ffffff',
+            flowerBackground: '#808080',
+            perimeterColor: '#003366',
+            interiorColor: '#a9a9a9',
+            mosaicColor1: '#006400',
+            mosaicColor2: '#ffffff',
+            mosaicDirection: 'diagonal1',
+            edgeColor: '#333333',
+            fillColor: '#ffffff',
+            textColor: '#000000',
+            hexSize: 25,
+            hexSpacing: 0.80,
+            showLabels: true
+        };
+        // Additional config for new triangle visualization modes
+        config.visualMode = 'triangle-hexagons';
+        config.triangleRows = 5;
+        config.trianglePointyUp = true; // true = apex/top, false = apex/bottom
+
+        // Zoom and pan state
+        let viewBox = {
+            x: 0,
+            y: 0,
+            width: 1000,
+            height: 1000,
+            scale: 1
+        };
+        let isPanning = false;
+        let startPoint = { x: 0, y: 0 };
+
+        // Generate center hexagons for hexagram (matching Python logic)
+        function generateCenterHexagons(layers) {
+            const hexes = [];
+            for (let q = -layers; q <= layers; q++) {
+                for (let r = -layers; r <= layers; r++) {
+                    if (Math.abs(q) <= layers && Math.abs(r) <= layers && Math.abs(q + r) <= layers) {
+                        hexes.push({ q, r, s: -q - r });
+                    }
+                }
+            }
+            return hexes;
+        }
+
+        // Hex direction helpers (matching Python)
+        function hexDirection(direction) {
+            const directions = [
+                { q: 1, r: 0, s: -1 },   // 0
+                { q: 1, r: -1, s: 0 },   // 1
+                { q: 0, r: -1, s: 1 },   // 2
+                { q: -1, r: 0, s: 1 },   // 3
+                { q: -1, r: 1, s: 0 },   // 4
+                { q: 0, r: 1, s: -1 }    // 5
+            ];
+            return directions[direction];
+        }
+
+        // Generate triangle extension for hexagram point (matching Python)
+        function generateTriangle(baseHex, direction, layers) {
+            const dir1 = hexDirection(direction);
+            const dir2 = hexDirection((direction + 2) % 6);
+            const hexes = [];
+
+            for (let layer = 1; layer <= layers; layer++) {
+                for (let i = 0; i <= layer; i++) {
+                    const q = baseHex.q + layer * dir1.q + i * dir2.q;
+                    const r = baseHex.r + layer * dir1.r + i * dir2.r;
+                    hexes.push({ q, r, s: -q - r });
+                }
+            }
+
+            return hexes;
+        }
+
+        // Generate complete hexagram shape (matching Python logic)
+        function generateHexagram(layers) {
+            const hexes = new Map();
+
+            // Add center hexagons
+            const centerHexes = generateCenterHexagons(layers);
+            centerHexes.forEach(h => {
+                const key = `${h.q},${h.r},${h.s}`;
+                hexes.set(key, h);
+            });
+
+            // Base positions for the 6 triangular points
+            const baseHexes = [
+                { q: 0, r: layers, s: -layers },
+                { q: layers, r: 0, s: -layers },
+                { q: layers, r: -layers, s: 0 },
+                { q: 0, r: -layers, s: layers },
+                { q: -layers, r: 0, s: layers },
+                { q: -layers, r: layers, s: 0 }
+            ];
+
+            // Add 6 triangular extensions
+            baseHexes.forEach((baseHex, direction) => {
+                const triangle = generateTriangle(baseHex, direction, layers);
+                triangle.forEach(h => {
+                    const key = `${h.q},${h.r},${h.s}`;
+                    hexes.set(key, h);
+                });
+            });
+
+            // Convert map to array
+            const hexArray = Array.from(hexes.values());
+
+            // Sort by (-r, q) for top to bottom ordering (matching Python)
+            hexArray.sort((a, b) => {
+                if (a.r !== b.r) return a.r - b.r;
+                return a.q - b.q;
+            });
+
+            // Add sequential IDs
+            hexArray.forEach((h, i) => h.id = i + 1);
+
+            return hexArray;
+        }
+
+        // Get neighbors of a hexagon
+        function getNeighbors(hex) {
+            const neighbors = [];
+            for (let i = 0; i < 6; i++) {
+                const dir = hexDirection(i);
+                neighbors.push({
+                    q: hex.q + dir.q,
+                    r: hex.r + dir.r,
+                    s: hex.s + dir.s
+                });
+            }
+            return neighbors;
+        }
+
+        // Determine perimeter hexagons
+        function findPerimeter(hexagons) {
+            const hexSet = new Set(hexagons.map(h => `${h.q},${h.r},${h.s}`));
+            const perimeter = new Set();
+
+            hexagons.forEach(h => {
+                const neighbors = getNeighbors(h);
+                const hasExternalNeighbor = neighbors.some(n => !hexSet.has(`${n.q},${n.r},${n.s}`));
+                if (hasExternalNeighbor) {
+                    perimeter.add(`${h.q},${h.r},${h.s}`);
+                }
+            });
+
+            return perimeter;
+        }
+
+        // Create flower pattern (matching Python's create_flower_pattern)
+        function createFlowerPattern(hexagons, spacing) {
+            const hexSet = new Set(hexagons.map(h => `${h.q},${h.r},${h.s}`));
+            const colorMap = new Map();
+
+            // Initialize all to background
+            hexagons.forEach(h => {
+                colorMap.set(`${h.q},${h.r},${h.s}`, config.flowerBackground);
+            });
+
+            // Find flower centers
+            const flowerCenters = [];
+            const maxCoord = Math.max(...hexagons.map(h => Math.max(Math.abs(h.q), Math.abs(h.r), Math.abs(h.s))));
+
+            for (let q = -maxCoord; q <= maxCoord; q += spacing) {
+                for (let r = -maxCoord; r <= maxCoord; r += spacing) {
+                    const s = -q - r;
+                    const key = `${q},${r},${s}`;
+                    if (hexSet.has(key)) {
+                        flowerCenters.push({ q, r, s });
+                    }
+                }
+            }
+
+            // Color centers and petals
+            flowerCenters.forEach(center => {
+                const centerKey = `${center.q},${center.r},${center.s}`;
+                colorMap.set(centerKey, config.flowerCenter);
+
+                // Color all 6 neighbors as petals
+                for (let direction = 0; direction < 6; direction++) {
+                    const dir = hexDirection(direction);
+                    const neighbor = {
+                        q: center.q + dir.q,
+                        r: center.r + dir.r,
+                        s: center.s + dir.s
+                    };
+                    const neighborKey = `${neighbor.q},${neighbor.r},${neighbor.s}`;
+                    if (hexSet.has(neighborKey)) {
+                        colorMap.set(neighborKey, config.flowerPetal);
+                    }
+                }
+            });
+
+            return { colorMap, flowerCenters };
+        }
+
+        // Create perimeter pattern (matching Python's create_perimeter_pattern)
+        function createPerimeterPattern(hexagons, perimeterSet) {
+            const colorMap = new Map();
+
+            hexagons.forEach(h => {
+                const key = `${h.q},${h.r},${h.s}`;
+                if (perimeterSet.has(key)) {
+                    colorMap.set(key, config.perimeterColor);
+                } else {
+                    colorMap.set(key, config.interiorColor);
+                }
+            });
+
+            return colorMap;
+        }
+
+        // Create mosaic pattern (matching Python's mosaic directions)
+        function createMosaicPattern(hexagons) {
+            const colorMap = new Map();
+            const colors = [config.mosaicColor1, config.mosaicColor2];
+
+            const directionFormulas = {
+                'diagonal1': (h) => h.q + h.r,
+                'diagonal2': (h) => h.s,
+                'diagonal3': (h) => h.q - h.r,
+                'vertical': (h) => h.q,
+                'horizontal': (h) => h.r
+            };
+
+            const formula = directionFormulas[config.mosaicDirection];
+
+            hexagons.forEach(h => {
+                const key = `${h.q},${h.r},${h.s}`;
+                const colorIndex = Math.abs(formula(h) % colors.length);
+                colorMap.set(key, colors[colorIndex]);
+            });
+
+            return colorMap;
+        }
+
+        // Convert axial to pixel coordinates (matching Python's hex_to_pixel)
+        function axialToPixel(q, r, size) {
+            const x = size * Math.sqrt(3) * (q + r / 2);
+            const y = size * (3 / 2) * r;
+            return { x, y };
+        }
+
+        // Create hexagon path
+        function hexPath(x, y, size) {
+            const points = [];
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 180) * (60 * i + 30);
+                points.push([
+                    x + size * Math.cos(angle),
+                    y + size * Math.sin(angle)
+                ]);
+            }
+            return `M ${points.map(p => p.join(',')).join(' L ')} Z`;
+        }
+
+        // Determine text color based on background
+        function getTextColor(bgColor) {
+            // Simple contrast calculation
+            const hex = bgColor.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            return brightness > 128 ? '#000000' : '#ffffff';
+        }
+
+        // Render the hexagon grid
+        function render() {
+            const svg = document.getElementById('hexCanvas');
+            svg.innerHTML = '';
+
+            // Branch on visualization mode
+            if (config.visualMode === 'hexagram') {
+                // Existing hexagram rendering
+                const hexagons = generateHexagram(config.starLayers);
+                const size = config.hexSize;
+
+                // Find perimeter
+                const perimeterSet = findPerimeter(hexagons);
+
+                // Create color pattern based on selected pattern type
+                let colorMap;
+                let flowerCenters = [];
+
+                if (config.patternType === 'flower') {
+                    const result = createFlowerPattern(hexagons, config.flowerSpacing);
+                    colorMap = result.colorMap;
+                    flowerCenters = result.flowerCenters;
+                    document.getElementById('flowerInfo').style.display = 'block';
+                    document.getElementById('flowerCenterCount').textContent = flowerCenters.length;
+                } else if (config.patternType === 'perimeter') {
+                    colorMap = createPerimeterPattern(hexagons, perimeterSet);
+                    document.getElementById('flowerInfo').style.display = 'none';
+                } else if (config.patternType === 'mosaic') {
+                    colorMap = createMosaicPattern(hexagons);
+                    document.getElementById('flowerInfo').style.display = 'none';
+                }
+
+                // Calculate SVG dimensions
+                const maxRadius = config.starLayers * size * 4.5;
+                const svgSize = maxRadius * 2;
+
+                svg.setAttribute('width', svgSize);
+                svg.setAttribute('height', svgSize);
+
+                // Update viewBox initial values if needed
+                if (viewBox.width === 1000 && viewBox.height === 1000) {
+                    viewBox.width = svgSize;
+                    viewBox.height = svgSize;
+                    viewBox.x = -maxRadius;
+                    viewBox.y = -maxRadius;
+                }
+
+                svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+
+                // Draw hexagons
+                hexagons.forEach(hex => {
+                    const { x, y } = axialToPixel(hex.q, hex.r, size);
+                    const hexKey = `${hex.q},${hex.r},${hex.s}`;
+                    const hexColor = colorMap.get(hexKey);
+
+                    // Create group for hexagon and text
+                    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+                    // Create hexagon
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', hexPath(x, y, size * 0.95));
+                    path.setAttribute('fill', hexColor);
+                    path.setAttribute('stroke', config.edgeColor);
+                    path.setAttribute('stroke-width', '1.5');
+                    g.appendChild(path);
+
+                    // Create text label
+                    if (config.showLabels) {
+                        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        text.setAttribute('x', x);
+                        text.setAttribute('y', y);
+                        text.setAttribute('text-anchor', 'middle');
+                        text.setAttribute('dominant-baseline', 'middle');
+                        text.setAttribute('font-size', size * 0.35);
+                        text.setAttribute('fill', getTextColor(hexColor));
+                        text.setAttribute('font-weight', 'normal');
+                        text.textContent = hex.id;
+                        g.appendChild(text);
+                    }
+
+                    svg.appendChild(g);
+                });
+
+                // Update info
+                document.getElementById('totalHex').textContent = hexagons.length;
+            } else if (config.visualMode === 'triangle-hexagons') {
+                // Triangle of hexagons (based on triangle-hexagons.py)
+                const rows = config.triangleRows;
+                const hexRadius = config.hexSize; // radius in pixels
+                const side_length = 2 * hexRadius;
+                // Apply spacing to the distance between centers
+                const vertical_distance = side_length * Math.sqrt(3) / 2 * config.hexSpacing;
+                const horizontal_spacing = side_length * config.hexSpacing;
+
+                // Calculate total and svg size
+                const total = (rows * (rows + 1)) / 2;
+                // Height needs to account for full hexagon extent
+                const fig_height = (rows - 1) * vertical_distance + side_length;
+                const fig_width = (rows - 1) * horizontal_spacing + side_length;
+                // Larger padding to ensure full visibility
+                const padding = Math.max(hexRadius * 4, side_length);
+                const svgWidth = fig_width + padding * 2;
+                const svgHeight = fig_height + padding * 2;
+                svg.setAttribute('width', svgWidth);
+                svg.setAttribute('height', svgHeight);
+
+                viewBox.x = -svgWidth / 2;
+                viewBox.y = -svgHeight / 2;
+                viewBox.width = svgWidth;
+                viewBox.height = svgHeight;
+                svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+
+                let id = 1;
+                for (let row = 0; row < rows; row++) {
+                    const num_in_row = row + 1;
+                    const width_row = (num_in_row - 1) * horizontal_spacing + side_length;
+                    const x_start = -width_row / 2 + side_length / 2;
+                    for (let col = 0; col < num_in_row; col++) {
+                        if (id > total) break;
+                        const x_center = x_start + col * horizontal_spacing;
+                        // Center the triangle vertically around y=0
+                        const y_center = (config.trianglePointyUp ? 1 : -1) * (row - (rows - 1) / 2) * vertical_distance;
+
+                        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        // Keep hexagon size constant, spacing affects position
+                        path.setAttribute('d', hexPath(x_center, y_center, hexRadius * 0.95));
+                        path.setAttribute('fill', config.fillColor);
+                        path.setAttribute('stroke', config.edgeColor);
+                        path.setAttribute('stroke-width', '1.5');
+                        g.appendChild(path);
+
+                        if (config.showLabels) {
+                            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                            text.setAttribute('x', x_center);
+                            text.setAttribute('y', y_center);
+                            text.setAttribute('text-anchor', 'middle');
+                            text.setAttribute('dominant-baseline', 'middle');
+                            text.setAttribute('font-size', hexRadius * 0.4);
+                            text.setAttribute('fill', config.textColor);
+                            text.textContent = id;
+                            g.appendChild(text);
+                        }
+
+                        svg.appendChild(g);
+                        id++;
+                    }
+                }
+
+                document.getElementById('totalHex').textContent = total;
+            } else if (config.visualMode === 'triangle-circles') {
+                // Triangle of circles (based on triangle-circles.py)
+                const rows = config.triangleRows;
+                const base_side_length = config.hexSize * 1.8; // base spacing for circles
+                const side_length = base_side_length * config.hexSpacing; // apply spacing to distance
+                const total = (rows * (rows + 1)) / 2;
+
+                // Calculate svg size - matching Python implementation
+                const padding = side_length;
+                const fig_width = side_length * rows;
+                const fig_height = Math.sqrt(3) / 2 * side_length * rows;
+                const svgWidth = fig_width + padding * 2;
+                const svgHeight = fig_height + padding * 2;
+                svg.setAttribute('width', svgWidth);
+                svg.setAttribute('height', svgHeight);
+
+                viewBox.x = -svgWidth / 2;
+                viewBox.y = -svgHeight / 2;
+                viewBox.width = svgWidth;
+                viewBox.height = svgHeight;
+                svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+
+                let id = 1;
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col <= row; col++) {
+                        if (id > total) break;
+                        const x = (col - row / 2) * side_length;
+                        // Center the triangle vertically around y=0
+                        const y = (config.trianglePointyUp ? 1 : -1) * Math.sqrt(3) / 2 * side_length * (row - (rows - 1) / 2);
+
+                        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        circle.setAttribute('cx', x);
+                        circle.setAttribute('cy', y);
+                        // Circle radius is half the side_length (matching Python implementation)
+                        circle.setAttribute('r', side_length / 2);
+                        circle.setAttribute('fill', config.fillColor);
+                        circle.setAttribute('stroke', config.edgeColor);
+                        circle.setAttribute('stroke-width', '1.2');
+                        svg.appendChild(circle);
+
+                        if (config.showLabels) {
+                            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                            text.setAttribute('x', x);
+                            text.setAttribute('y', y);
+                            text.setAttribute('text-anchor', 'middle');
+                            text.setAttribute('dominant-baseline', 'middle');
+                            text.setAttribute('font-size', side_length * 0.22);
+                            text.setAttribute('fill', config.textColor);
+                            text.textContent = id;
+                            svg.appendChild(text);
+                        }
+
+                        id++;
+                    }
+                }
+
+                document.getElementById('totalHex').textContent = total;
+            }
+        }
+
+        // Zoom and pan functions
+        function setupZoomPan() {
+            const svg = document.getElementById('hexCanvas');
+            let lastTouchDistance = 0;
+
+            // Mouse wheel zoom
+            svg.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
+                const rect = svg.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                const svgX = viewBox.x + (mouseX / rect.width) * viewBox.width;
+                const svgY = viewBox.y + (mouseY / rect.height) * viewBox.height;
+
+                const newWidth = viewBox.width * zoomFactor;
+                const newHeight = viewBox.height * zoomFactor;
+
+                viewBox.x = svgX - (mouseX / rect.width) * newWidth;
+                viewBox.y = svgY - (mouseY / rect.height) * newHeight;
+                viewBox.width = newWidth;
+                viewBox.height = newHeight;
+
+                svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+            });
+
+            // Mouse pan
+            svg.addEventListener('mousedown', (e) => {
+                if (e.button === 0) {
+                    isPanning = true;
+                    const rect = svg.getBoundingClientRect();
+                    startPoint = {
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top
+                    };
+                    svg.style.cursor = 'grabbing';
+                }
+            });
+
+            svg.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    const rect = svg.getBoundingClientRect();
+                    const currentX = e.clientX - rect.left;
+                    const currentY = e.clientY - rect.top;
+
+                    const dx = (startPoint.x - currentX) * (viewBox.width / rect.width);
+                    const dy = (startPoint.y - currentY) * (viewBox.height / rect.height);
+
+                    viewBox.x += dx;
+                    viewBox.y += dy;
+
+                    startPoint.x = currentX;
+                    startPoint.y = currentY;
+
+                    svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+                }
+            });
+
+            svg.addEventListener('mouseup', () => {
+                isPanning = false;
+                svg.style.cursor = 'grab';
+            });
+
+            svg.addEventListener('mouseleave', () => {
+                isPanning = false;
+                svg.style.cursor = 'grab';
+            });
+
+            // Touch support for mobile
+            svg.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    // Single touch - pan
+                    isPanning = true;
+                    const rect = svg.getBoundingClientRect();
+                    startPoint = {
+                        x: e.touches[0].clientX - rect.left,
+                        y: e.touches[0].clientY - rect.top
+                    };
+                } else if (e.touches.length === 2) {
+                    // Two touches - pinch zoom
+                    isPanning = false;
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+                }
+                e.preventDefault();
+            });
+
+            svg.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1 && isPanning) {
+                    // Single touch pan
+                    const rect = svg.getBoundingClientRect();
+                    const currentX = e.touches[0].clientX - rect.left;
+                    const currentY = e.touches[0].clientY - rect.top;
+
+                    const dx = (startPoint.x - currentX) * (viewBox.width / rect.width);
+                    const dy = (startPoint.y - currentY) * (viewBox.height / rect.height);
+
+                    viewBox.x += dx;
+                    viewBox.y += dy;
+
+                    startPoint.x = currentX;
+                    startPoint.y = currentY;
+
+                    svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+                } else if (e.touches.length === 2) {
+                    // Pinch zoom
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (lastTouchDistance > 0) {
+                        const zoomFactor = lastTouchDistance / distance;
+                        const rect = svg.getBoundingClientRect();
+                        const centerX = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left;
+                        const centerY = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top;
+
+                        const svgX = viewBox.x + (centerX / rect.width) * viewBox.width;
+                        const svgY = viewBox.y + (centerY / rect.height) * viewBox.height;
+
+                        const newWidth = viewBox.width * zoomFactor;
+                        const newHeight = viewBox.height * zoomFactor;
+
+                        viewBox.x = svgX - (centerX / rect.width) * newWidth;
+                        viewBox.y = svgY - (centerY / rect.height) * newHeight;
+                        viewBox.width = newWidth;
+                        viewBox.height = newHeight;
+
+                        svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+                    }
+                    lastTouchDistance = distance;
+                }
+                e.preventDefault();
+            });
+
+            svg.addEventListener('touchend', () => {
+                isPanning = false;
+                lastTouchDistance = 0;
+            });
+
+            // Double tap to reset
+            let lastTap = 0;
+            svg.addEventListener('touchend', (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                if (tapLength < 300 && tapLength > 0) {
+                    // Double tap detected - reset view
+                    render();
+                    e.preventDefault();
+                }
+                lastTap = currentTime;
+            });
+
+            svg.style.cursor = 'grab';
+        }
+
+        // Show/hide pattern controls
+        function updatePatternControls() {
+            // These controls don't exist in this version of the HTML
+            // This function is kept for compatibility but does nothing
+        }
+
+        // Event listeners
+        // Note: starLayers and pattern controls removed as they don't exist in this version
+
+        // Visualization mode listener
+        document.getElementById('visualMode').addEventListener('change', (e) => {
+            config.visualMode = e.target.value;
+            document.getElementById('visualModeValue').textContent = document.getElementById('visualMode').selectedOptions[0].text;
+            // Show triangle-specific controls when triangle modes are selected
+            document.getElementById('triangleControls').style.display = (config.visualMode === 'hexagram') ? 'none' : 'block';
+            document.getElementById('triangleOrientationControls').style.display = (config.visualMode === 'hexagram') ? 'none' : 'block';
+            updatePatternControls();
+            render();
+        });
+
+        document.getElementById('triangleRows').addEventListener('input', (e) => {
+            config.triangleRows = parseInt(e.target.value);
+            document.getElementById('triangleRowsValue').textContent = config.triangleRows;
+            render();
+        });
+
+        // Triangle orientation listener
+        document.querySelectorAll('input[name="triangleOrientation"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                config.trianglePointyUp = e.target.value === 'up';
+                render();
+            });
+        });
+
+        // Pattern color controls removed - not in this version
+
+        document.getElementById('edgeColor').addEventListener('input', (e) => {
+            config.edgeColor = e.target.value;
+            render();
+        });
+
+        document.getElementById('fillColor').addEventListener('input', (e) => {
+            config.fillColor = e.target.value;
+            render();
+        });
+
+        document.getElementById('textColor').addEventListener('input', (e) => {
+            config.textColor = e.target.value;
+            render();
+        });
+
+        document.getElementById('hexSize').addEventListener('input', (e) => {
+            config.hexSize = parseInt(e.target.value);
+            document.getElementById('hexSizeValue').textContent = config.hexSize;
+            render();
+        });
+
+        document.getElementById('hexSpacing').addEventListener('input', (e) => {
+            config.hexSpacing = parseFloat(e.target.value);
+            document.getElementById('hexSpacingValue').textContent = config.hexSpacing.toFixed(2);
+            render();
+        });
+
+        document.getElementById('showLabels').addEventListener('change', (e) => {
+            config.showLabels = e.target.checked;
+            render();
+        });
+
+        function resetView() {
+            config.visualMode = 'triangle-hexagons';
+            config.triangleRows = 5;
+            config.trianglePointyUp = true;
+            config.edgeColor = '#333333';
+            config.fillColor = '#ffffff';
+            config.textColor = '#000000';
+            config.hexSize = 25;
+            config.hexSpacing = 0.80;
+            config.showLabels = true;
+
+            document.getElementById('edgeColor').value = '#333333';
+            document.getElementById('fillColor').value = '#ffffff';
+            document.getElementById('textColor').value = '#000000';
+            document.getElementById('hexSize').value = 25;
+            document.getElementById('hexSizeValue').textContent = 25;
+            document.getElementById('hexSpacing').value = 0.80;
+            document.getElementById('hexSpacingValue').textContent = '0.80';
+            document.getElementById('showLabels').checked = true;
+            document.getElementById('visualMode').value = 'triangle-hexagons';
+            document.getElementById('visualModeValue').textContent = 'Triangle — Hexagons';
+            document.getElementById('triangleRows').value = 5;
+            document.getElementById('triangleRowsValue').textContent = 5;
+            document.getElementById('triangleControls').style.display = 'block';
+            document.getElementById('triangleOrientationControls').style.display = 'block';
+            document.getElementById('triangleUp').checked = true;
+
+            render();
+        }
+
+        function savePNG() {
+            const svg = document.getElementById('hexCanvas');
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            // Get actual SVG dimensions
+            const svgWidth = svg.width.baseVal.value;
+            const svgHeight = svg.height.baseVal.value;
+
+            canvas.width = svgWidth;
+            canvas.height = svgHeight;
+
+            img.onload = function() {
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, svgWidth, svgHeight);
+
+                const link = document.createElement('a');
+                const filename = `${config.visualMode}-rows${config.triangleRows}.png`;
+                link.download = filename;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+        }
+
+        // Initial render
+        updatePatternControls();
+        // Show triangle controls since we start in triangle mode
+        document.getElementById('triangleControls').style.display = 'block';
+        document.getElementById('triangleOrientationControls').style.display = 'block';
+        render();
+        setupZoomPan();
+    </script>
+</body>
+</html>
